@@ -63,8 +63,7 @@ class TankAnimator:
         plot_width = self.tank.ch_width * 5 #Half the plot width
         self.ax.set_xlim(self.tank.x - plot_width, self.tank.x + plot_width) #Set Screen Limits
         self.ax.set_ylim(self.tank.y - plot_width, self.tank.y + plot_width)     
-        plt.title('Differential Drive Simulation')
-        # plt.subtitle(str('Port RPM: %f Starboard RPM: %f',tank.port_rpm, tank.strb_rpm))
+        plt.suptitle('Differential Drive Simulation')
         plt.xlabel('X-Coordinate (cm)')
         plt.ylabel('Y-Coordinate (cm)')
 
@@ -79,6 +78,7 @@ class TankAnimator:
                 a.update(self.time[j])
 
             self.bm.update()
+            plt.title("Port RPM: {} Starboard RPM: {}".format(self.tank.port_rpm, self.tank.strb_rpm))
             plt.pause(0.1)
 
         plt.show(block=True)
