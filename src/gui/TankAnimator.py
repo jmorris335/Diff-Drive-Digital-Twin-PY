@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 from numpy import arange
 
-from BlitManager import BlitManager
-from DrawTank import *
-from Tank import Tank
+from src.gui.BlitManager import BlitManager
+from src.gui.DrawTank import *
+from src.objects.Tank import Tank
 
 class TankAnimator:
     def __init__(self, **kwargs):

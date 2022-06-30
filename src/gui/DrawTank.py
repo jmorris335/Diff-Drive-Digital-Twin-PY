@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 
-from Tank import Tank
+from src.objects.Tank import Tank
 
 # For more information, see https://matplotlib.org/stable/gallery/shapes_and_collections/artist_reference.html#sphx-glr-gallery-shapes-and-collections-artist-reference-py
 
