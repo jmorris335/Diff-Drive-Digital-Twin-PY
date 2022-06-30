@@ -17,3 +17,6 @@ dist/
 # ignore autosave
 ~$*.docx
 Archive.zip
+
+# ignore quick-testing 
+scratchpaper.py

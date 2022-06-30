@@ -1,10 +1,19 @@
+# Program: DrawTank.py
+# Author: John Morris, jhmrrs@clemson.edu
+# Date: 30 Jun 2022
+# Purpose: Return a set of patches imitating a robotic, differential drive
+#  vehicle that can be plotted to a matplotlib canvas.
+# Permissions: All rights reserved. Do not reuse without written permission from the owner.
+# Sources: 
+#   For more information on patches see 
+#   https://matplotlib.org/stable/gallery/shapes_and_collections/artist_reference.html#sphx-glr-gallery-shapes-and-collections-artist-reference-py
+
+
 import numpy as np
 import matplotlib.patches as mpatches
 import matplotlib.lines as mlines
 
 from src.objects.Tank import Tank
-
-# For more information, see https://matplotlib.org/stable/gallery/shapes_and_collections/artist_reference.html#sphx-glr-gallery-shapes-and-collections-artist-reference-py
 
 class SuperPatch:
     def __init__(self):

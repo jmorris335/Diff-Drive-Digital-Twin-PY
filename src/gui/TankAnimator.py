@@ -1,3 +1,10 @@
+# Class: TankAnimator.py
+# Author: John Morris, jhmmrs@clemson.edu
+# Date: 30 June 2022
+# Purpose: A calling class that animates the motion of a differential drive
+#   vehicle given a inputted speed or voltage.
+# Permissions: All rights reserved. Do not reuse without written permission from the owner.
+
 import matplotlib.pyplot as plt
 from numpy import arange
 
@@ -10,16 +17,19 @@ class TankAnimator:
         for arg in kwargs:
             if arg == "tank": self.tank = arg["tank"]
             if arg == "time": self.time = arg["time"]
+            if arg == "port_voltage": self.port_voltage = arg["port_voltage"]
+            if arg == "strb_voltage": self.strb_voltage = arg["strb_voltage"]
             if arg == "port_rpm": self.port_rpm = arg["port_rpm"]
             if arg == "strb_rpm": self.strb_rpm = arg["strb_rpm"]
 
-        if "tank" not in kwargs: 
-            self.tank = Tank()
-            self.tank.updatePosition()
-            self.tank.updateSpeed()
+        if "tank" not in kwargs: self.tank = Tank()
         if "time" not in kwargs: self.time = list(arange(0, 5, 0.1))
-        if "port_rpm" not in kwargs: self.port_rpm = [20 for z in self.time]
-        if "strb_rpm" not in kwargs: self.strb_rpm = [10 for z in self.time]
+        if "port_voltage" not in kwargs: self.port_voltage = [18 for z in self.time]
+        if "strb_voltage" not in kwargs: self.strb_voltage = [12 for z in self.time]
+        if "port_rpm" not in kwargs and "strb_rpm" not in kwargs:
+            self.port_rpm, self.strb_rpm = self.tank.simulateMotors(self.time, 
+                                                self.port_voltage, self.strb_voltage, 
+                                                np.zeros_like(self.time), np.zeros_like(self.time)) 
 
         self.fig, self.ax = plt.subplots()
         self.patch_objects = list()

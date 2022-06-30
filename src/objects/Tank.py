@@ -1,9 +1,12 @@
-# Class:      Tank.m
-# Author:     John Morris, jhmrrs@clemson.edu
-# Date:       29 Jun 2022
-# Permission: All rights reserved. Do not reuse without written permission from the owner
+# Class: Tank.m
+# Author: John Morris, jhmrrs@clemson.edu
+# Date: 29 Jun 2022
+# Purpose: Represent a differential drive vehicle with a set of motors
+# Permission: All rights reserved. Do not reuse without written permission from the owner.
 
 import numpy as np
+
+from src.objects.DC_Motor import DC_Motor
 
 class Tank:
     '''
@@ -33,14 +36,19 @@ class Tank:
             if arg == "radius": self.ch_height = arg["radius"]
             if arg == "port_motor": self.ch_height = arg["port_motor"]
             if arg == "strb_motor": self.ch_height = arg["strb_motor"]
+            if arg == "gear_reduction": self.gear_reduction = arg["gear_reduction"]
         
         if "ch_height" not in kwargs: self.ch_height = 10
         if "ch_width" not in kwargs: self.ch_width = 5
         if "td_height" not in kwargs: self.td_height = 12
         if "td_width" not in kwargs: self.td_width = 2
         if "radius" not in kwargs: self.radius = 1
-        # if "port_motor" not in kwargs: self.port_motor = 10
-        # if "strb_motor" not in kwargs: self.strb_motor = 10
+        if "port_motor" not in kwargs: self.port_motor = DC_Motor()
+        if "strb_motor" not in kwargs: self.strb_motor = DC_Motor()
+        if "gear_reduction" not in kwargs: self.gear_reduction = 600
+
+        self.updatePosition(0, 0, 0)
+        self.updateSpeed(0, 0)
 
     def updatePosition(self, x=0, y=0, theta=0):
         # Setter for positional state
@@ -82,15 +90,18 @@ class Tank:
         newX, newY, newTheta = self.calcPosition(time_step)
         self.updatePosition(newX, newY, newTheta)
         
-    def simulateMotors(self, time, port_voltage, strb_voltage, port_load, strb_load):
-        ''' Solve Motor Speeds '''
+    def simulateMotors(self, time, port_voltage, strb_voltage, port_load, strb_load) -> tuple:
+        ''' Solve Motor Speeds (returns speeds in rpm)'''
         # Find motor rpm versus input voltage and payload
-        port_t, port_y = self.port_motor.simulate(time[len(time)-1], port_voltage, port_load)
-        strb_t, strb_y = self.strb_motor.simulate(time[len(time)-1], strb_voltage, strb_load)
+        port_t, port_y, port_x = self.port_motor.simulateMotor(time, port_voltage, port_load)
+        strb_t, strb_y, strb_x = self.strb_motor.simulateMotor(time, strb_voltage, strb_load)
 
         # Get rpm values at specific time samplings
-        port_motor_rpm = np.zeros([1, len(time)])
-        strb_motor_rpm = np.zeros([1, len(time)])
+        port_motor_rpm = list()
+        strb_motor_rpm = list()
         for i in range(len(time)):
-            port_motor_rpm[i] = port_y(np.where(port_t >= time[i], 1), 2) * 60 / 2 / np.pi
-            strb_motor_rpm[i] = strb_y(np.where(strb_t >= time[i], 1), 2) * 60 / 2 / np.pi
+            index = np.nonzero(port_t >= time[i])
+            port_motor_rpm.append(port_x[index[0][0]][1] * 60 / 2 / np.pi / self.gear_reduction)
+            strb_motor_rpm.append(strb_x[index[0][0]][1] * 60 / 2 / np.pi / self.gear_reduction)
+        
+        return port_motor_rpm, strb_motor_rpm
