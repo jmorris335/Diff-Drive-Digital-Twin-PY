@@ -1,0 +1,16 @@
+# ignore virtual environments (named .venv)
+.venv
+
+# ignore compiled objects
+src/STL/__pycache__/
+*.pyc
+*.pyo
+curr_plot.png
+
+# ignore built environments
+build/
+dist/
+
+# ignore autosave
+~$*.docx
+Archive.zip

@@ -82,7 +82,3 @@ class TankAnimator:
             plt.pause(0.1)
 
         plt.show(block=True)
-
-if __name__ == "__main__":
-    ta = TankAnimator()
-    ta.animate()
