@@ -14,22 +14,16 @@ from src.objects.Tank import Tank
 
 class TankAnimator:
     def __init__(self, **kwargs):
-        for arg in kwargs:
-            if arg == "tank": self.tank = arg["tank"]
-            if arg == "time": self.time = arg["time"]
-            if arg == "port_voltage": self.port_voltage = arg["port_voltage"]
-            if arg == "strb_voltage": self.strb_voltage = arg["strb_voltage"]
-            if arg == "port_rpm": self.port_rpm = arg["port_rpm"]
-            if arg == "strb_rpm": self.strb_rpm = arg["strb_rpm"]
+        for key, value in kwargs.items():
+            if key == "tank": self.tank = value
+            if key == "time": self.time = value
+            if key == "port_rpm": self.port_rpm = value
+            if key == "strb_rpm": self.strb_rpm = value
 
         if "tank" not in kwargs: self.tank = Tank()
         if "time" not in kwargs: self.time = list(arange(0, 5, 0.1))
-        if "port_voltage" not in kwargs: self.port_voltage = [18 for z in self.time]
-        if "strb_voltage" not in kwargs: self.strb_voltage = [12 for z in self.time]
-        if "port_rpm" not in kwargs and "strb_rpm" not in kwargs:
-            self.port_rpm, self.strb_rpm = self.tank.simulateMotors(self.time, 
-                                                self.port_voltage, self.strb_voltage, 
-                                                np.zeros_like(self.time), np.zeros_like(self.time)) 
+        if "port_rpm" not in kwargs: self.port_rpm = [20 for z in self.time]
+        if "strb_rpm" not in kwargs: self.strb_rpm = [10 for z in self.time]
 
         self.fig, self.ax = plt.subplots()
         self.patch_objects = list()
@@ -88,7 +82,7 @@ class TankAnimator:
                 a.update(self.time[j])
 
             self.bm.update()
-            plt.title("Port RPM: {} Starboard RPM: {}".format(self.tank.port_rpm, self.tank.strb_rpm))
+            plt.title("Port RPM: {:.2f} Starboard RPM: {:.2f}".format(self.tank.port_rpm, self.tank.strb_rpm))
             plt.pause(0.1)
 
         plt.show(block=True)

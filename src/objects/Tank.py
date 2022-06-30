@@ -19,36 +19,56 @@ class Tank:
         '''
         Inputs:  
         ---
-            theta:        The angle of the tank from the abscissa (radians)
-            port_rpm:     Revolutions per Minute for port sprocket
-            strb_rpm:     Revolutions per Minute for starboard sprocket
-            radius:       Effective radius for drive sprocket
-            ch_height:    The height of the chassis (cm)
-            ch_width:     The width of the chassis (cm)
-            td_height:    The height of the treads (cm)
-            td_width:     The width of the treads (cm)
+            theta : float=0.
+                The angle of the tank from the abscissa (radians)
+            port_rpm : float=0.
+                Revolutions Per Minute for port sprocket
+            strb_rpm : float=0
+                Revolutions Per Minute for starboard sprocket
+            radius : float=1
+                Effective radius for drive sprocket (units of length)
+            ch_height : float=10.
+                The height of the chassis (units of length)
+            ch_width : float=5.
+                The width of the chassis (units of length)
+            td_height : float=12.
+                The height of the treads (units of length)
+            td_width : float=2.
+                The width of the treads (units of length)
+            port_motor : DC_Motor
+                DC motor driving the port sprocket
+            strb_motor : DC_Motor
+                DC motor driving the starboard sprocket
+            gear_reduction : float=100.
+                Reduction of speed from the motor to the sprocket
         '''
-        for arg in kwargs:
-            if arg == "ch_height": self.ch_height = arg["ch_height"]
-            if arg == "ch_width": self.ch_height = arg["ch_width"]
-            if arg == "td_height": self.ch_height = arg["td_height"]
-            if arg == "td_width": self.ch_height = arg["td_width"]
-            if arg == "radius": self.ch_height = arg["radius"]
-            if arg == "port_motor": self.ch_height = arg["port_motor"]
-            if arg == "strb_motor": self.ch_height = arg["strb_motor"]
-            if arg == "gear_reduction": self.gear_reduction = arg["gear_reduction"]
+        for key, value in kwargs.items():
+            if key == "theta": self.theta = value
+            if key == "port_rpm": self.port_rpm = value
+            if key == "strb_rpm": self.strb_rpm = value
+            if key == "ch_height": self.ch_height = value
+            if key == "ch_width": self.ch_width = value
+            if key == "td_height": self.td_height = value
+            if key == "td_width": self.td_width = value
+            if key == "radius": self.radius = value
+            if key == "port_motor": self.port_motor = value
+            if key == "strb_motor": self.strb_motor = value
+            if key == "gear_reduction": self.gear_reduction = value
         
-        if "ch_height" not in kwargs: self.ch_height = 10
-        if "ch_width" not in kwargs: self.ch_width = 5
-        if "td_height" not in kwargs: self.td_height = 12
-        if "td_width" not in kwargs: self.td_width = 2
-        if "radius" not in kwargs: self.radius = 1
+        if "theta" not in kwargs: self.theta = 0.
+        if "port_rpm" not in kwargs: self.port_rpm = 0.
+        if "strb_rpm" not in kwargs: self.strb_rpm = 0.
+        if "ch_height" not in kwargs: self.ch_height = 10.
+        if "ch_width" not in kwargs: self.ch_width = 5.
+        if "td_height" not in kwargs: self.td_height = 12.
+        if "td_width" not in kwargs: self.td_width = 2.
+        if "radius" not in kwargs: self.radius = 1.
         if "port_motor" not in kwargs: self.port_motor = DC_Motor()
         if "strb_motor" not in kwargs: self.strb_motor = DC_Motor()
-        if "gear_reduction" not in kwargs: self.gear_reduction = 600
+        if "gear_reduction" not in kwargs: self.gear_reduction = 100.
 
-        self.updatePosition(0, 0, 0)
-        self.updateSpeed(0, 0)
+        self.updatePosition(0, 0, self.theta)
+        self.updateSpeed(self.port_rpm, self.strb_rpm)
 
     def updatePosition(self, x=0, y=0, theta=0):
         # Setter for positional state
