@@ -1,7 +1,12 @@
 # ignore virtual environments (named .venv)
 .venv
 
+# ignore launch and debugging files
+.vscode/
+launch.*
+
 # ignore compiled objects
+__pycache__/
 *.pyc
 *.pyo
 
