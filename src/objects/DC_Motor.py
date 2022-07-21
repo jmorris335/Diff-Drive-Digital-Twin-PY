@@ -89,6 +89,10 @@ class DC_Motor:
         theta_0 : float=0.
             The initial angular position (rad)
         '''
+        #TODO: These motors are coupled, and cannot be solved for independently. This simulation needs to be
+        #brought over to the Tank.py file, and then the relationship between the MoI for tank compared to their individual
+        #motions should be solved for.
+        
         v_s = np.array(voltage_source)
         T_L = np.array(torque_of_payload)
 

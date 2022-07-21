@@ -2,6 +2,8 @@ import numpy as np
 
 from src.objects import *
 from src.objects.DC_Motor import DC_Motor
+from src.objects.Sprocket import Sprocket
+from src.objects.Tread import Tread
 from src.objects.Tank import Tank
 
 from src.gui.TankAnimator import TankAnimator
@@ -24,6 +26,28 @@ class Tank_TD:
         port_motor = DC_Motor(R_a, L_a, J_M, k, B_M)
         strb_motor = DC_Motor(R_a, L_a, J_M, k, B_M)
 
+        # Sprockets Parameters
+        spkt_mass = 0.2 #kg
+        spkt_radius = 0.02 #m
+        spkt_axle_radius = 0.005 #m
+        spkt_rolling_friction = 0.6 #kinetic coeff of friction
+
+        self.driver = Sprocket(mass=spkt_mass, radius=spkt_radius, axle_radius=spkt_axle_radius,
+                                rolling_friciton=spkt_rolling_friction)
+        self.follower = Sprocket(mass=spkt_mass, radius=spkt_radius, axle_radius=spkt_axle_radius,
+                                rolling_friciton=spkt_rolling_friction)
+
+        # Tread Parameters
+        tread_mass_links = 0.907
+        tread_num_followers = 6
+        tread_num_links = 200
+        tread_link_friction = 0.60
+        tread_ground_lift_force = 0.0
+
+        self.tread = Tread(driver=self.driver, follower=self.follower, mass_links=tread_mass_links,
+                           num_followers=tread_num_followers, num_links=tread_num_links, link_friction=tread_link_friction,
+                           ground_lift_force=tread_ground_lift_force)
+
         # Tank Parameters
         chassis_height = 10.
         chassis_width = 5.
@@ -32,14 +56,20 @@ class Tank_TD:
         driving_radius = 1.
 
         self.tank = Tank(ch_height=chassis_height, ch_width=chassis_width,
-                         td_height=tread_height, td_width=tread_width, 
-                         radius=driving_radius, port_motor=port_motor, strb_motor=strb_motor)
+                    td_height=tread_height, td_width=tread_width, 
+                    radius=driving_radius, port_motor=port_motor, strb_motor=strb_motor, tread=self.tread)
 
         # Voltage parameters
         self.port_voltage = [18 for z in self.time]
         self.strb_voltage = [12 for z in self.time]
+
+        # Load parameters
+        self.port_load = [self.tread.calcTorqueFriction() for z in self.time]
+        self.strb_load = [self.tread.calcTorqueFriction() for z in self.time]
+
         self.port_rpm, self.strb_rpm = self.tank.simulateMotors(self.time, self.port_voltage, self.strb_voltage, 
-                                                        np.zeros_like(self.time), np.zeros_like(self.time)) 
+                                                        self.port_load, self.strb_load) 
+        #TODO: Figure out how the Moment of Inertia changes with both motors arbitrarily engaged
 
     def animate(self):
         self.anim = TankAnimator(tank = self.tank, time=self.time, 

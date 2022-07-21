@@ -7,6 +7,7 @@
 import numpy as np
 
 from src.objects.DC_Motor import DC_Motor
+from src.objects.Tread import Tread
 
 class Tank:
     '''
@@ -19,42 +20,47 @@ class Tank:
         '''
         Inputs:  
         ---
-            theta : float=0.
+            * theta : float=0.
                 The angle of the tank from the abscissa (radians)
-            port_rpm : float=0.
+            * port_rpm : float=0.
                 Revolutions Per Minute for port sprocket
-            strb_rpm : float=0
+            * strb_rpm : float=0
                 Revolutions Per Minute for starboard sprocket
-            radius : float=1
+            * radius : float=1
                 Effective radius for drive sprocket (units of length)
-            ch_height : float=10.
+            * ch_height : float=10.
                 The height of the chassis (units of length)
-            ch_width : float=5.
+            * ch_width : float=5.
                 The width of the chassis (units of length)
-            td_height : float=12.
+            * td_height : float=12.
                 The height of the treads (units of length)
-            td_width : float=2.
+            * td_width : float=2.
                 The width of the treads (units of length)
-            port_motor : DC_Motor
+            * mass : float=5.
+                The mass of the load, not including treads and sprockets (units of mass)
+            * port_motor : DC_Motor
                 DC motor driving the port sprocket
-            strb_motor : DC_Motor
+            * strb_motor : DC_Motor
                 DC motor driving the starboard sprocket
-            gear_reduction : float=100.
+            * gear_reduction : float=100.
                 Reduction of speed from the motor to the sprocket
         '''
         for key, value in kwargs.items():
             if key == "theta": self.theta = value
             if key == "port_rpm": self.port_rpm = value
             if key == "strb_rpm": self.strb_rpm = value
+            if key == "port_motor": self.port_motor = value
+            if key == "strb_motor": self.strb_motor = value
+            if key == "tread": self.tread = value
             if key == "ch_height": self.ch_height = value
             if key == "ch_width": self.ch_width = value
             if key == "td_height": self.td_height = value
             if key == "td_width": self.td_width = value
+            if key == "mass": self.mass = value
             if key == "radius": self.radius = value
-            if key == "port_motor": self.port_motor = value
-            if key == "strb_motor": self.strb_motor = value
             if key == "gear_reduction": self.gear_reduction = value
         
+        #Default Values
         if "theta" not in kwargs: self.theta = 0.
         if "port_rpm" not in kwargs: self.port_rpm = 0.
         if "strb_rpm" not in kwargs: self.strb_rpm = 0.
@@ -62,16 +68,18 @@ class Tank:
         if "ch_width" not in kwargs: self.ch_width = 5.
         if "td_height" not in kwargs: self.td_height = 12.
         if "td_width" not in kwargs: self.td_width = 2.
+        if "mass" not in kwargs: self.mass = 5.
         if "radius" not in kwargs: self.radius = 1.
         if "port_motor" not in kwargs: self.port_motor = DC_Motor()
         if "strb_motor" not in kwargs: self.strb_motor = DC_Motor()
+        if "tread" not in kwargs: self.tread = Tread()
         if "gear_reduction" not in kwargs: self.gear_reduction = 100.
 
         self.updatePosition(0, 0, self.theta)
         self.updateSpeed(self.port_rpm, self.strb_rpm)
 
     def updatePosition(self, x=0, y=0, theta=0):
-        # Setter for positional state
+        '''Setter for positional state'''
         self.x = x
         self.y = y
         self.theta = theta
@@ -109,6 +117,14 @@ class Tank:
         self.updateSpeed(port_rpm, strb_rpm)
         newX, newY, newTheta = self.calcPosition(time_step)
         self.updatePosition(newX, newY, newTheta)
+
+    def calcMomentofInertia(self):
+        ''' Adds together the moment of inertia for each object in the tank'''
+        #TODO: Make a gearbox object
+        J_tread = self.tread.MoI
+        J_load = self.mass ( self.tread.driver.radius ** 2)
+        J_gearbox = 0
+        return (J_tread + J_load + J_gearbox) / self.gear_reduction ** 2 + J_gearbox
         
     def simulateMotors(self, time, port_voltage, strb_voltage, port_load, strb_load) -> tuple:
         ''' Solve Motor Speeds (returns speeds in rpm)'''
