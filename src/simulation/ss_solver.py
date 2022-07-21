@@ -1,4 +1,4 @@
-# Modified from scipy.signal.lsim2, which could not handle multiple inputs
+# Modified from scipy.signal.lsim2, which could not handle MIMO/MISO systems
 #
 # Program: SS_Solver.py
 # Author: modified by John Morris, jhmrrs@clemson.edu

@@ -1,5 +1,6 @@
 import numpy as np
 
+from src.objects import *
 from src.objects.DC_Motor import DC_Motor
 from src.objects.Tank import Tank
 
