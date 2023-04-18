@@ -64,8 +64,8 @@ class Tank_TD:
         self.strb_voltage = [12 for z in self.time]
 
         # Load parameters
-        self.port_load = [self.tread.calcTorqueFriction() for z in self.time]
-        self.strb_load = [self.tread.calcTorqueFriction() for z in self.time]
+        self.port_load = [self.tread.torque_friction for z in self.time]
+        self.strb_load = [self.tread.torque_friction for z in self.time]
 
         self.port_rpm, self.strb_rpm = self.tank.simulateMotors(self.time, self.port_voltage, self.strb_voltage, 
                                                         self.port_load, self.strb_load) 
