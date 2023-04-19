@@ -12,6 +12,7 @@
 import numpy as np
 from scipy import signal
 from src.simulation.ss_solver import ss_solver
+from src.analysis.charts import plotSimResults
 
 class DC_Motor:
     def __init__(self, resistance_armature=0.5, winding_leakage_inductance=1.5e-3, 
@@ -70,7 +71,7 @@ class DC_Motor:
         return signal.StateSpace(A, B, C, D)
 
     def simulateMotor(self, time : list, voltage_source : list, torque_of_payload : list, 
-                      i_a_0: float=0., omega_0: float=0., theta_0: float=0.) -> tuple:
+                      i_a_0: float=0., omega_0: float=0., theta_0: float=0., to_plot: bool=False) -> tuple:
         '''
         Simulate the motor response.
         
@@ -88,6 +89,8 @@ class DC_Motor:
             The initial angular roation (rad/s)
         theta_0 : float=0.
             The initial angular position (rad)
+        to_plot : bool=False
+            True if desired to chart results of simulation
         '''
         #TODO: These motors are coupled, and cannot be solved for independently. This simulation needs to be
         #brought over to the Tank.py file, and then the relationship between the MoI for tank compared to their individual
@@ -99,6 +102,7 @@ class DC_Motor:
         U = np.column_stack((v_s, T_L))
         x0 = [i_a_0, omega_0, theta_0]
         T, Y, X = ss_solver(self.sys, time, U, x0)
+        if to_plot: plotSimResults(T, Y, X)
         return T, Y, X
 
     def getGeneratedTorque(self, input_current):
