@@ -35,7 +35,7 @@ class Tread:
             if key == "mass_links": self.mass_links = value
             if key == "num_followers": self.num_followers = value
             if key == "num_links": self.num_links = value
-            if key == "link_friction": self.link_friciton = value
+            if key == "link_friction": self.link_friction = value
             if key == "ground_lift_force": self.ground_lift_force = value
         
         #Default Values
@@ -48,24 +48,28 @@ class Tread:
         if "ground_lift_force" not in kwargs: self.ground_lift_force = 0.0
 
         self.mass = self.driver.mass + self.num_followers*self.follower.mass + self.mass_links
-        self.resistance_force = self.calcRollingFriction(self.link_friciton, self.mass_links, self.num_links) + self.ground_lift_force
-        self.MoI = self.calcMomentOfInertia()
+        self.torque_friction = self.calcTorqueFriction(self.link_friction, self.mass_links, self.driver, self.follower, self.num_followers)
+        # self.resistance_force = self.calcRollingFriction(self.link_friciton, self.mass_links, self.num_links) + self.ground_lift_force
+        self.MoI = self.calcMomentOfInertia(self.driver, self.follower, self.mass_links)
 
-    def calcTorqueFriction(self):
+    @staticmethod
+    def calcTorqueFriction(link_friction: float, mass_links: float, 
+                           driver: Sprocket, follower: Sprocket, num_followers: int):
         ''' Calculates the torque friction generated during motion (kinetic, not static), **UNITS ARE MKGS**. 
         Reference: https://www.linearmotiontips.com/how-to-calculate-motor-drive-torque-for-belt-and-pulley-systems/
         '''
         g = 9.81 #m/s^2
-        link_torque_friction = self.mu * self.mass_links * g * self.driver.radius
-        driver_torque_friction = self.driver.calcTorqueFriction()
-        flwr_torque_friction = self.follower.calcTorqueFriction()
-        return link_torque_friction + driver_torque_friction + self.num_followers * flwr_torque_friction
+        link_torque_friction = link_friction * mass_links * g * driver.radius
+        driver_torque_friction = driver.torque_friction_kinetic
+        flwr_torque_friction = follower.torque_friction_kinetic
+        return link_torque_friction + driver_torque_friction + num_followers * flwr_torque_friction
 
-    def calcMomentOfInertia(self):
+    @staticmethod
+    def calcMomentOfInertia(driver: Sprocket, follower: Sprocket, mass_links: float):
         ''' Calculates the total moment of inertia for the tread system. Reference: 
         https://www.linearmotiontips.com/how-to-account-for-belt-and-pulley-inertia-during-system-design/
         '''
-        J_driver = self.driver.MoI
-        J_follower = self.follower.MoI
-        J_links = self.mass_links * self.driver.radius ** 2
+        J_driver = driver.MoI
+        J_follower = follower.MoI
+        J_links = mass_links * driver.radius ** 2
         return J_driver + J_follower + J_links

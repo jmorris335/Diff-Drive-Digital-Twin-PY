@@ -30,6 +30,8 @@ class TankAnimator:
         self.line_objects = list()
         self.patches = list()
         self.lines = list()
+        self.x_coords = [self.tank.x]
+        self.y_coords = [self.tank.y]
         self.getObjects()
         self.initializePlot()
 
@@ -66,16 +68,27 @@ class TankAnimator:
     def initializePlot(self):
         plot_width = self.tank.ch_width * 5 #Half the plot width
         self.ax.set_xlim(self.tank.x - plot_width, self.tank.x + plot_width) #Set Screen Limits
-        self.ax.set_ylim(self.tank.y - plot_width, self.tank.y + plot_width)     
+        self.ax.set_ylim(self.tank.y - plot_width, self.tank.y + plot_width)
+        self.ax.set_aspect('equal', adjustable='box')     
         plt.suptitle('Differential Drive Simulation')
         plt.xlabel('X-Coordinate (cm)')
         plt.ylabel('Y-Coordinate (cm)')
+
+    def moveTank(self, port_rpm, strb_rpm, step_duration):
+        ''' Moves the tank and updates the travel route'''
+        self.tank.move(port_rpm, strb_rpm, step_duration)
+        self.x_coords.append(self.tank.x)
+        self.y_coords.append(self.tank.y)
+
+    def plotRoute(self):
+        self.ax.plot(self.x_coords, self.y_coords, ls='--', lw=2, color="#F56600")
 
     def animate(self):
         for j in range(len(self.time)):
             if j == len(self.time) - 1: step_duration = self.time[j] - self.time[j-1]
             else: step_duration = self.time[j+1] - self.time[j]
-            self.tank.move(self.port_rpm[j], self.strb_rpm[j], step_duration)
+            self.moveTank(self.port_rpm[j], self.strb_rpm[j], step_duration)
+            self.plotRoute()
             for a in self.patch_objects:
                 a.update()
             for a in self.line_objects:
@@ -83,6 +96,6 @@ class TankAnimator:
 
             self.bm.update()
             plt.title("Port RPM: {:.2f} Starboard RPM: {:.2f}".format(self.tank.port_rpm, self.tank.strb_rpm))
-            plt.pause(0.1)
+            plt.pause(0.001)
 
         plt.show(block=True)

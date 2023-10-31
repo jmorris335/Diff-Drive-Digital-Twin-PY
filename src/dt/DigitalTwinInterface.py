@@ -10,7 +10,7 @@ from src.gui.TankAnimator import TankAnimator
 
 class Tank_TD:
     def __init__(self):
-        end_time = 3
+        end_time = 10
 
         # Simulation parameters
         self.time = np.arange(0, end_time, 0.03)
@@ -60,15 +60,28 @@ class Tank_TD:
                     radius=driving_radius, port_motor=port_motor, strb_motor=strb_motor, tread=self.tread)
 
         # Voltage parameters
-        self.port_voltage = [18 for z in self.time]
-        self.strb_voltage = [12 for z in self.time]
+        self.port_voltage = list()
+        self.strb_voltage = list()
+        for z in self.time:
+            if z < end_time * 1/3:
+                self.port_voltage.append(18)
+                self.strb_voltage.append(12)
+            elif z < end_time * 1/2:
+                self.port_voltage.append(18)
+                self.strb_voltage.append(-18)
+            elif z < end_time * 2/3:
+                self.port_voltage.append(-12)
+                self.strb_voltage.append(-18)
+            else:
+                self.port_voltage.append(12)
+                self.strb_voltage.append(24)
 
         # Load parameters
-        self.port_load = [self.tread.calcTorqueFriction() for z in self.time]
-        self.strb_load = [self.tread.calcTorqueFriction() for z in self.time]
+        self.port_load = [self.tread.torque_friction for z in self.time]
+        self.strb_load = [self.tread.torque_friction for z in self.time]
 
         self.port_rpm, self.strb_rpm = self.tank.simulateMotors(self.time, self.port_voltage, self.strb_voltage, 
-                                                        self.port_load, self.strb_load) 
+                                                        self.port_load, self.strb_load, True) 
         #TODO: Figure out how the Moment of Inertia changes with both motors arbitrarily engaged
 
     def animate(self):

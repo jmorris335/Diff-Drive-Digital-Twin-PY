@@ -126,10 +126,10 @@ class Tank:
         J_gearbox = 0
         return (J_tread + J_load + J_gearbox) / self.gear_reduction ** 2 + J_gearbox
         
-    def simulateMotors(self, time, port_voltage, strb_voltage, port_load, strb_load) -> tuple:
+    def simulateMotors(self, time, port_voltage, strb_voltage, port_load, strb_load, to_plot=False) -> tuple:
         ''' Solve Motor Speeds (returns speeds in rpm)'''
         # Find motor rpm versus input voltage and payload
-        port_t, port_y, port_x = self.port_motor.simulateMotor(time, port_voltage, port_load)
+        port_t, port_y, port_x = self.port_motor.simulateMotor(time, port_voltage, port_load, to_plot=to_plot)
         strb_t, strb_y, strb_x = self.strb_motor.simulateMotor(time, strb_voltage, strb_load)
 
         # Get rpm values at specific time samplings
