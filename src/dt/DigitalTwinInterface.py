@@ -76,7 +76,9 @@ class Tank_TD:
                                  port_rpm=self.port_rpm, strb_rpm=self.strb_rpm)
         self.anim.animate()
 
-if __name__ == '__main__':
+def main():
     dt = Tank_TD()
-    dt.animate()
+    dt.animate()    
 
+if __name__ == '__main__':
+    main()
